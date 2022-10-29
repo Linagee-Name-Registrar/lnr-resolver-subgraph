@@ -1,0 +1,5 @@
+#
+.idea
+build
+generated
+node_modules

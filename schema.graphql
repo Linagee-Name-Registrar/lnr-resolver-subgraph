@@ -1,0 +1,15 @@
+type Domain @entity {
+  id: ID!
+  nameBytecode: Bytes
+  nameUtf8: String
+  primary: Bytes
+  controller: Bytes
+  index: Int
+}
+
+type Stats @entity {
+  id: ID!
+  index: Int
+  totalPrimary: Int
+  totalController: Int
+}

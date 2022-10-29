@@ -1,0 +1,27 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Contract
+    network: mainnet
+    source:
+      address: "0x6023E55814DC00F094386d4eb7e17Ce49ab1A190"
+      abi: Contract
+      startBlock: 15829140 # contract creation
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Domain
+        - Stats
+      abis:
+        - name: Contract
+          file: ./abis/Contract.json
+      eventHandlers:
+        - event: NewController(indexed bytes32,indexed address)
+          handler: handleNewController
+        - event: NewPrimary(indexed bytes32,indexed address)
+          handler: handleNewPrimary
+      file: ./src/mapping.ts
