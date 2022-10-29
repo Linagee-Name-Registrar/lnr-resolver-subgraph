@@ -6,6 +6,10 @@
 When the Resolver implementation contract is updated, the ABI from 
 this subgraph must also be updated and the subgraph deployed again.
 
+### Deployed url
+Currently this subgraph is deployed [here](https://thegraph.com/hosted-service/subgraph/chriton/lnr-resolver-subgraph).
+You can deploy your own or use that one.
+
 # How to deploy this subgraph
 
 - Create an account at [thegraph](https://thegraph.com/)
