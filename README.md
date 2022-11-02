@@ -24,8 +24,9 @@ yarn global add @graphprotocol/graph-cli
 # INSTALL THE DEPENDENCIES
 yarn install
 
-# AUTH AND DEPLOY. KEY IS IN THEGRAPH PAGE
-graph auth --studio {your_key}
+# AUTH (ON STUDIO OR HOSTED) AND DEPLOY. KEY IS IN THEGRAPH PAGE
+graph auth --product subgraph-studio {your_key}
+graph auth --product hosted-service {your_key}
 
 # BUILD THE SUBGRAPH
 graph codegen && graph build
@@ -35,18 +36,29 @@ graph deploy --product subgraph-studio {subgraph_name}
 graph deploy --product hosted-service {your_github_account}/{subgraph_name}
 ```
 
-### Example query
+### Example query to get the users/addresses
 
 ```
+
 {
-  domains(first: 1000, orderBy: index, orderDirection: asc) {
-    id
-    nameBytecode,
-    nameUtf8,
-    primary,
-    controller,
+  users(first: 1000, orderBy: index, orderDirection: asc) {
+    id,
+    isPrimaryForDomain,
+    isControllerForDomain,
     index
   }
 }
+
+```
+
+### See the number of primary and controllers set
+```
+{
+  stats(id:1) {
+    totalPrimary,
+    totalController
+  }
+}
+
 ```
 
