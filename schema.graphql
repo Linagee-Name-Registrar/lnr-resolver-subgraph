@@ -7,6 +7,13 @@ type Domain @entity {
   index: Int
 }
 
+type User @entity {
+  id: ID!
+  isPrimaryForDomain: String
+  isControllerForDomain: [String!]!
+  index: Int
+}
+
 type Stats @entity {
   id: ID!
   index: Int

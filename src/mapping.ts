@@ -1,66 +1,94 @@
 import {
-  Contract,
-  NewController,
-  NewPrimary,
+    Contract,
+    NewController,
+    NewPrimary,
 } from "../generated/Contract/Contract"
-import { Domain, Stats } from "../generated/schema"
+import {User, Stats} from "../generated/schema"
+import {Bytes, log} from "@graphprotocol/graph-ts"
 
 export function handleNewController(event: NewController): void {
-  // name, controller
+    // name, controller
 
-  let domainEntity = loadDomainEntity(event.params.name.toHexString());
-  domainEntity.nameBytecode = event.params.name;
-  domainEntity.nameUtf8 = event.params.name.toString();
-  domainEntity.controller = event.params.controller;
-  domainEntity.save();
+    let controller = event.params.controller;
+    let userEntity = loadUserEntity(controller);
+    let domain = event.params.name.toHexString();
 
-  // TODO - update totalController
+    let statsEntity = loadStatsEntity();
+
+    // TODO - check for duplicates? if already contains the value don't add it again
+    let controllers = userEntity.isControllerForDomain;
+    controllers.push(domain);
+    userEntity.isControllerForDomain = controllers;
+    userEntity.save();
+
+    statsEntity.totalController = statsEntity.totalController + 1;
+    statsEntity.save();
 }
 
 export function handleNewPrimary(event: NewPrimary): void {
-  // name, primary
+    // name, primary
 
-  let domainEntity = loadDomainEntity(event.params.name.toHexString());
-  domainEntity.nameBytecode = event.params.name;
-  domainEntity.nameUtf8 = event.params.name.toString();
-  domainEntity.primary = event.params.primary;
-  domainEntity.save();
+    let userEntity = loadUserEntity(event.params.primary);
+    let statsEntity = loadStatsEntity();
+    let domain = event.params.name.toHexString();
 
-  // TODO - update totalPrimary
-  // if name is 0x00 - it is unsetPrimary()?
+    if (domain.includes("0x0000000000000000000000000000000000000000000000000000000000000000")) {
+        //
+        userEntity.isPrimaryForDomain = null;
+        userEntity.save();
+        statsEntity.totalPrimary = statsEntity.totalPrimary - 1;
+        statsEntity.save();
+        //log.error("if case for handleNewPrimary: {}", [domain]);
+
+    } else {
+
+        // Some have just set the primary over the old value, without calling unsetPrimary first
+        // So if isPrimaryForDomain has a value then don't add + 1 because we already counted it once
+        if (userEntity.isPrimaryForDomain === null) {
+            statsEntity.totalPrimary = statsEntity.totalPrimary + 1;
+            statsEntity.save();
+        }
+
+        userEntity.isPrimaryForDomain = domain;
+        userEntity.save();
+    }
 }
 
-export function loadDomainEntity(name: string): Domain {
 
-  let entity = Domain.load("name-".concat(name))
+export function loadUserEntity(address: Bytes): User {
 
-  if (!entity) {
-    entity = new Domain("name-".concat(name))
+    let userEntity = User.load(address.toHexString());
 
-    {/** ------------ Update the Stats index ------------ **/}
-    let stats = loadStatsEntity()
-    stats.index = stats.index + 1;
-    stats.save();
-    {/** ------------ Update the Stats index ------------ **/}
+    if (userEntity == null) {
+        userEntity = new User(address.toHexString());
 
-    entity.index = stats.index;
-    entity.save();
-  }
+        {/** ------------ Update Stats.index ------------ **/
+        }
+        let statsEntity = loadStatsEntity();
+        statsEntity.index = statsEntity.index + 1;
+        statsEntity.save();
+        {/** ------------ Update Stats.index ------------ **/
+        }
 
-  return entity
+        userEntity.index = statsEntity.index;
+        userEntity.isControllerForDomain = new Array<string>();
+        userEntity.save();
+    }
+    return userEntity;
 }
+
 
 export function loadStatsEntity(): Stats {
 
-  let entity = Stats.load('1');
+    let statsEntity = Stats.load("1");
 
-  if (!entity) {
-    entity = new Stats('1');
-    entity.index = 0;
-    entity.totalPrimary = 0;
-    entity.totalController = 0;
-    entity.save();
-  }
+    if (statsEntity == null) {
+        statsEntity = new Stats("1");
+        statsEntity.index = 0;
+        statsEntity.totalPrimary = 0;
+        statsEntity.totalController = 0;
+        statsEntity.save();
+    }
 
-  return entity
+    return statsEntity;
 }
