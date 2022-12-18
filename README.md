@@ -39,7 +39,6 @@ graph deploy --product hosted-service {your_github_account}/{subgraph_name}
 ### Example query to get the users/addresses
 
 ```
-
 {
   users(first: 1000, orderBy: index, orderDirection: asc) {
     id,
@@ -48,7 +47,6 @@ graph deploy --product hosted-service {your_github_account}/{subgraph_name}
     index
   }
 }
-
 ```
 
 ### Example query to see the number of primary and controllers set
@@ -59,7 +57,6 @@ graph deploy --product hosted-service {your_github_account}/{subgraph_name}
     totalController
   }
 }
-
 ```
 
 ### Example query to see the primary domain and controller set for x address
@@ -70,8 +67,8 @@ graph deploy --product hosted-service {your_github_account}/{subgraph_name}
     isControllerForDomain
   }
 }
-
 ```
+
 Note that at the moment the address provided must be lower case. <br/>
 The value returned for isControllerForDomain is an array because a user can set an address to be
 the controller for multiple domains.
