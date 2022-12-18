@@ -51,7 +51,7 @@ graph deploy --product hosted-service {your_github_account}/{subgraph_name}
 
 ```
 
-### See the number of primary and controllers set
+### Example query to see the number of primary and controllers set
 ```
 {
   stats(id:1) {
@@ -61,4 +61,18 @@ graph deploy --product hosted-service {your_github_account}/{subgraph_name}
 }
 
 ```
+
+### Example query to see the primary domain and controller set for x address
+```
+{
+  users(where: {id: "0xf0330757848fce323cc55f9768dc641f966325b2"}) {
+    isPrimaryForDomain,
+    isControllerForDomain
+  }
+}
+
+```
+Note that at the moment the address provided must be lower case. <br/>
+The value returned for isControllerForDomain is an array because a user can set an address to be
+the controller for multiple domains.
 
